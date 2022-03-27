@@ -1,4 +1,5 @@
-import { createContext } from "react";
+import { createContext, ReactNode } from "react";
+import { api } from "../services/api";
 
 type SignInCredentials = {
   email: string;
@@ -9,14 +10,26 @@ type AuthContextData = {
   signIn(credentials: SignInCredentials): Promise<void>;
 };
 
-const AuthContext = createContext({} as AuthContextData);
+type AuthProviderProps = {
+  children: ReactNode;
 
-export function AuthProvider({ children }) {
+}
+
+export const AuthContext = createContext({} as AuthContextData);
+
+export function AuthProvider({ children }: AuthProviderProps) {
   const isAuthenticated = false;
 
-  function signIn({ email, password }: SignInCredentials) {
-    console.log(email, password);
+  async function signIn({ email, password }: SignInCredentials) {
+    try {
+      const response = await api.post('sessions', { email, password })
+
+      console.log(response.data)
+    } catch (err) {
+      console.log(err)
+
+    }
   }
 
-  return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ signIn, isAuthenticated }}>{children}</AuthContext.Provider>;
 }
