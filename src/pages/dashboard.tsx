@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react"
 import { AuthContext } from "../contexts/AuthContext"
-import { api } from "../services/api"
+import { setupAPIClient } from "../services/api"
+import { api } from "../services/apiClient";
 import { withSSRAuth } from "../utils/withSSRAuth"
 
 export default function Dashboard() {
@@ -14,12 +15,18 @@ export default function Dashboard() {
   }, [])
 
   return (
-    <h1>Dashboard: {user?.email}</h1>
-
+    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+      <h1>Dashboard: {user?.email}</h1>
+    </div>
   )
 }
 
 export const getServerSideProps = withSSRAuth(async (ctx) => {
+  const apiClient = setupAPIClient(ctx)
+  const response = await apiClient.get('/me')
+
+  console.log(response.data)
+
   return {
     props: {
 
